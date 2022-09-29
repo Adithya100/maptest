@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html> 
+<head> 
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8" /> 
+  <title>Google Maps Multiple Markers</title> 
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBjtjVSizpQPgVGixNClFE6X85C2-Bk0UY"
+  type="text/javascript"></script>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.js" ></script>
+   <script src="https://unpkg.com/chartjs-chart-geo@3.5.2/build/index.umd.min.js" ></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js" ></script>
+  <style>
+    .canvas {
+  width: 100vw;
+  height: 100vh;
+}
+  </style>
+</head> 
+<body>
+  <canvas id="canvas" style="width:100%;max-width:700px"></canvas>
+
+  <!-- <script>
+    $( document ).ready(function() {
+      "use strict";
+
+Promise.all([fetch('https://unpkg.com/us-atlas/states-10m.json').then(r => r.json()), fetch('https://gist.githubusercontent.com/mbostock/9535021/raw/928a5f81f170b767162f8f52dbad05985eae9cac/us-state-capitals.csv').then(r => r.text()).then(d => Papa.parse(d, {
+  dynamicTyping: true,
+  header: true
+}).data)]).then(([us, data]) => {
+  const states = ChartGeo.topojson.feature(us, us.objects.states).features;
+  const chart = new Chart(document.getElementById("canvas").getContext("2d"), {
+    type: 'bubbleMap',
+    data: {
+      labels: data.map(d => d.description),
+      datasets: [{
+        outline: states,
+        showOutline: true,
+        backgroundColor: 'steelblue',
+        data: data.map(d => Object.assign(d, {
+          value: Math.round(Math.random() * 10)
+        }))
+      }]
+    },
+    options: {
+      plugins: {
+        legend: {
+          display: false
+        },
+        datalabels: {
+          align: 'top',
+          formatter: v => {
+            return v.description;
+          }
+        }
+      },
+      scales: {
+        xy: {
+          projection: 'albersUsa'
+        },
+        r: {
+          size: [1, 20]
+        }
+      }
+    }
+  });
+});
+});
+    
+  </script> -->
+  <script>
+    $( document ).ready(function() {
+      "use strict";
+
+        fetch('https://unpkg.com/us-atlas/states-10m.json').then(r => r.json()).then(us => {
+          const nation = ChartGeo.topojson.feature(us, us.objects.nation).features[0];
+          const states = ChartGeo.topojson.feature(us, us.objects.states).features;
+          const chart = new Chart(document.getElementById("canvas").getContext("2d"), {
+            type: 'choropleth',
+            data: {
+              labels: states.map(d => d.properties.name),
+              datasets: [{
+                label: 'States',
+                outline: nation,
+                data: states.map(d => ({
+                  feature: d,
+                  value: Math.random() * 10
+                }))
+              }]
+            },
+            options: {
+              plugins: {
+                legend: {
+                  display: false
+                },
+                tooltip: {
+                usePointStyle: true,
+                callbacks: {
+                    labelPointStyle: function(context) {
+                        return {
+                            pointStyle: 'triangle',
+                            rotation: 90
+                        };
+                    }
+                }
+            },
+              },
+              scales: {
+                xy: {
+                  projection: 'albersUsa'
+                },
+                color: {
+                  quantize: 5,
+                  legend: {
+                    position: 'bottom-right',
+                    align: 'bottom'
+                  }
+                }
+              }
+            }
+          });
+      });
+    });
+  </script>
+</body>
+</html>
